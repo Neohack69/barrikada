@@ -19,7 +19,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
 
-  /* 3D-фон: WebGL-стройматериалы */
+  /* 3D-фон: абстрактный WebGL */
   .bg3d{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
   .bg3d canvas{display:block}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
@@ -200,7 +200,7 @@ document.getElementById('rentForm').addEventListener('submit',e=>{
   document.getElementById('status').textContent='Открываем почтовый клиент с готовым письмом…';
 });
 
-/* 3D-фон на Three.js: стройматериалы, движение со скроллом */
+/* Абстрактный 3D-фон: волновая сетка + градиентные сферы, движение со скроллом */
 (function(){
   if(!window.THREE) return;
   const holder=document.getElementById('bg3d');
@@ -209,59 +209,57 @@ document.getElementById('rentForm').addEventListener('submit',e=>{
   renderer.setSize(innerWidth,innerHeight);
   holder.appendChild(renderer.domElement);
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,1,3000);
-  camera.position.z=760;
-  scene.add(new THREE.AmbientLight(0xffffff,.8));
-  const sun=new THREE.DirectionalLight(0xffffff,.7);
-  sun.position.set(400,600,500);
-  scene.add(sun);
+  const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,1,4000);
+  camera.position.set(0,180,520);
+  camera.lookAt(0,0,0);
 
   const group=new THREE.Group();
   scene.add(group);
 
   const rnd=(i)=>{const x=Math.sin(i*127.1)*43758.5453;return x-Math.floor(x);};
-  const mat=c=>new THREE.MeshLambertMaterial({color:c});
-  const geo={
-    brick:()=>new THREE.BoxGeometry(88,46,44),
-    plank:()=>new THREE.BoxGeometry(130,28,32),
-    pipe:()=>new THREE.CylinderGeometry(17,17,120,22).rotateZ(Math.PI/2),
-    nut:()=>new THREE.CylinderGeometry(38,38,28,6),
-    bucket:()=>new THREE.LatheGeometry([
-      new THREE.Vector2(.1,0),new THREE.Vector2(24,2),new THREE.Vector2(30,10),
-      new THREE.Vector2(33,44),new THREE.Vector2(30,50),new THREE.Vector2(26,46),
-      new THREE.Vector2(24,12),new THREE.Vector2(.1,8)],24),
-  };
-  const mats=[
-    ['brick',0xc2571b],['plank',0xe8a13a],['bucket',0x2b6cb0],
-    ['pipe',0xc53030],['nut',0x2c6e3f],['brick',0xb83280],
-  ];
-  const items=[];
-  for(let i=0;i<13;i++){
-    const [g,c]=mats[i%mats.length];
-    const m=new THREE.Mesh(geo[g](),mat(c));
-    const s=.7+rnd(i)*.9;
-    m.scale.setScalar(s);
-    m.position.set(rnd(i+10)*1300-650, rnd(i+20)*860-430, -rnd(i+30)*560);
-    m.rotation.set(rnd(i+40)*Math.PI, rnd(i+50)*Math.PI, rnd(i+60)*Math.PI);
+  const isDark=()=>document.documentElement.dataset.theme==='dark';
+
+  // волнистая сетка
+  const W=1400,H=900,SEG=42;
+  const wire=new THREE.Mesh(
+    new THREE.PlaneGeometry(W,H,SEG,SEG).rotateX(-Math.PI/2),
+    new THREE.MeshBasicMaterial({color:0x191510,wireframe:true,transparent:true,opacity:.10})
+  );
+  wire.position.y=-140;
+  group.add(wire);
+  const base=wire.geometry.attributes.position.array.slice();
+
+  // большие мягкие сферы
+  const orbs=[];
+  const orbColors=[0xd2401e,0xe8a13a,0x2b6cb0];
+  for(let i=0;i<6;i++){
+    const m=new THREE.Mesh(
+      new THREE.SphereGeometry(60+rnd(i)*90,32,32),
+      new THREE.MeshBasicMaterial({color:orbColors[i%3],transparent:true,opacity:.10,depthWrite:false})
+    );
+    m.position.set(rnd(i+10)*1400-700, rnd(i+20)*400-150, -300-rnd(i+30)*500);
     group.add(m);
-    items.push({m,spd:.4+rnd(i+70)*.7, amp:10+rnd(i+80)*14, ph:rnd(i+90)*6.28, y:m.position.y,
-      rx:(rnd(i+100)-.5)*.01, ry:(rnd(i+110)-.5)*.01});
+    orbs.push({m,ph:rnd(i+40)*6.28,spd:.2+rnd(i+50)*.4,y:m.position.y,amp:18+rnd(i+60)*22});
   }
-  // точки-акценты
-  const dots=new THREE.Group();
-  for(let i=0;i<12;i++){
-    const d=new THREE.Mesh(new THREE.SphereGeometry(3+rnd(i+120)*8,10,10),
-      new THREE.MeshBasicMaterial({color:0xd2401e,transparent:true,opacity:.35}));
-    d.position.set(rnd(i+130)*1300-650, rnd(i+140)*860-430, -rnd(i+150)*600);
-    dots.add(d);
+
+  function setTheme(){
+    const d=isDark();
+    wire.material.color.set(d?0xece5d8:0x191510);
   }
-  group.add(dots);
+  setTheme();
+  new MutationObserver(setTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 
   function frame(t){
     const time=t/1000;
-    for(const it of items){
-      it.m.position.y=it.y+Math.sin(time*it.spd+it.ph)*it.amp;
-      it.m.rotation.x+=it.rx; it.m.rotation.y+=it.ry;
+    // волна по сетке
+    const pos=wire.geometry.attributes.position;
+    for(let i=0;i<pos.count;i++){
+      const x=base[i*3], z=base[i*3+2];
+      pos.array[i*3+1]=Math.sin(x*.006+time*.7)*22+Math.cos(z*.008+time*.5)*22;
+    }
+    pos.needsUpdate=true;
+    for(const o of orbs){
+      o.m.position.y=o.y+Math.sin(time*o.spd+o.ph)*o.amp;
     }
     renderer.render(scene,camera);
     requestAnimationFrame(frame);
@@ -275,9 +273,9 @@ document.getElementById('rentForm').addEventListener('submit',e=>{
   });
   addEventListener('scroll',()=>{
     const s=scrollY;
-    group.rotation.x=1.02-s*.0012;
-    group.rotation.z=-.45+s*.0008;
-    group.position.y=-s*.15;
+    group.rotation.y=s*.0006;
+    group.position.y=-s*.12;
+    camera.position.y=180+s*.05;
   },{passive:true});
 })();
 
