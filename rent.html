@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ТЦ «Баррикада» — Аренда</title>
+<title>СТЦ «Баррикада» — Аренда</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -83,7 +83,7 @@
 <div class="veil" id="veil"></div>
 
 <header>
-  <div class="logo">ТЦ <em>«Баррикада»</em></div>
+  <div class="logo">СТЦ <em>«Баррикада»</em></div>
   <nav>
     <a href="#" data-go="index.html">Магазины</a>
     <a href="#" class="active" data-go="rent.html">Аренда</a>
@@ -164,7 +164,7 @@
 </section>
 
 <footer>
-  <span>© ТЦ «Баррикада», 2026</span>
+  <span>© СТЦ «Баррикада», 2026</span>
   <span>г. Орехово-Зуево, ул. Урицкого, 92 · Отдел аренды: rent@barrikada-tc.ru</span>
 </footer>
 
@@ -195,7 +195,7 @@ addEventListener('pageshow',e=>{ if(e.persisted) document.getElementById('veil')
 /* форма → письмо */
 document.getElementById('rentForm').addEventListener('submit',e=>{
   e.preventDefault();
-  const subject=encodeURIComponent('Заявка на аренду — ТЦ «Баррикада»');
+  const subject=encodeURIComponent('Заявка на аренду — СТЦ «Баррикада»');
   const body=encodeURIComponent(
     'Имя: '+document.getElementById('name').value+'\n'+
     'Email: '+document.getElementById('email').value+'\n'+
