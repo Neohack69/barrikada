@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>СТЦ «Баррикада» — Аренда</title>
-<script src="three.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -19,9 +18,6 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
 
-  /* 3D-фон: абстрактный WebGL */
-  .bg3d{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
-  .bg3d canvas{display:block}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
   a{color:inherit}
   .veil{position:fixed;inset:0;background:var(--ink);z-index:100;transform:scaleY(0);transform-origin:bottom;pointer-events:none}
@@ -81,7 +77,6 @@
 </style>
 </head>
 <body>
-<div class="bg3d" id="bg3d"></div>
 <div class="veil" id="veil"></div>
 
 <header>
@@ -200,84 +195,6 @@ document.getElementById('rentForm').addEventListener('submit',e=>{
   document.getElementById('status').textContent='Открываем почтовый клиент с готовым письмом…';
 });
 
-/* Абстрактный 3D-фон: волновая сетка + градиентные сферы, движение со скроллом */
-(function(){
-  if(!window.THREE) return;
-  const holder=document.getElementById('bg3d');
-  const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(innerWidth,innerHeight);
-  holder.appendChild(renderer.domElement);
-  const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,1,4000);
-  camera.position.set(0,180,520);
-  camera.lookAt(0,0,0);
-
-  const group=new THREE.Group();
-  scene.add(group);
-
-  const rnd=(i)=>{const x=Math.sin(i*127.1)*43758.5453;return x-Math.floor(x);};
-  const isDark=()=>document.documentElement.dataset.theme==='dark';
-
-  // волнистая сетка
-  const W=1400,H=900,SEG=42;
-  const wire=new THREE.Mesh(
-    new THREE.PlaneGeometry(W,H,SEG,SEG).rotateX(-Math.PI/2),
-    new THREE.MeshBasicMaterial({color:0x191510,wireframe:true,transparent:true,opacity:.10})
-  );
-  wire.position.y=-140;
-  group.add(wire);
-  const base=wire.geometry.attributes.position.array.slice();
-
-  // большие мягкие сферы
-  const orbs=[];
-  const orbColors=[0xd2401e,0xe8a13a,0x2b6cb0];
-  for(let i=0;i<6;i++){
-    const m=new THREE.Mesh(
-      new THREE.SphereGeometry(60+rnd(i)*90,32,32),
-      new THREE.MeshBasicMaterial({color:orbColors[i%3],transparent:true,opacity:.10,depthWrite:false})
-    );
-    m.position.set(rnd(i+10)*1400-700, rnd(i+20)*400-150, -300-rnd(i+30)*500);
-    group.add(m);
-    orbs.push({m,ph:rnd(i+40)*6.28,spd:.2+rnd(i+50)*.4,y:m.position.y,amp:18+rnd(i+60)*22});
-  }
-
-  function setTheme(){
-    const d=isDark();
-    wire.material.color.set(d?0xece5d8:0x191510);
-  }
-  setTheme();
-  new MutationObserver(setTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-
-  function frame(t){
-    const time=t/1000;
-    // волна по сетке
-    const pos=wire.geometry.attributes.position;
-    for(let i=0;i<pos.count;i++){
-      const x=base[i*3], z=base[i*3+2];
-      pos.array[i*3+1]=Math.sin(x*.006+time*.7)*22+Math.cos(z*.008+time*.5)*22;
-    }
-    pos.needsUpdate=true;
-    for(const o of orbs){
-      o.m.position.y=o.y+Math.sin(time*o.spd+o.ph)*o.amp;
-    }
-    renderer.render(scene,camera);
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-
-  addEventListener('resize',()=>{
-    camera.aspect=innerWidth/innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth,innerHeight);
-  });
-  addEventListener('scroll',()=>{
-    const s=scrollY;
-    group.rotation.y=s*.0006;
-    group.position.y=-s*.12;
-    camera.position.y=180+s*.05;
-  },{passive:true});
-})();
 
 const btn=document.getElementById('themeBtn');
 function setTheme(t){document.documentElement.dataset.theme=t;btn.textContent=t==='dark'?'☀ светло':'☾ темно';localStorage.theme=t;}
