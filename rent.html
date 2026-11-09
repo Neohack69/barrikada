@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЦ «Баррикада» — Аренда</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#efe9dd; --ink:#191510; --paper:#f7f2e8; --accent:#d2401e; --line:#191510;
+    --muted:#6b6152; --ok:#2f855a; --shadow:rgba(25,21,16,.18);
+  }
+  html[data-theme="dark"]{
+    --bg:#161310; --ink:#ece5d8; --paper:#201c17; --accent:#ff5a33; --line:#ece5d8;
+    --muted:#9a9080; --ok:#68d391; --shadow:rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
+  h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
+  a{color:inherit}
+  .veil{position:fixed;inset:0;background:var(--ink);z-index:100;transform:scaleY(0);transform-origin:bottom;pointer-events:none}
+  .veil.on{animation:veil .7s cubic-bezier(.7,0,.2,1) forwards}
+  @keyframes veil{0%{transform:scaleY(0);transform-origin:bottom}45%,55%{transform:scaleY(1)}100%{transform:scaleY(0);transform-origin:top}}
+
+  header{display:flex;align-items:center;justify-content:space-between;padding:20px 4vw;border-bottom:2px solid var(--line)}
+  .logo{font-weight:900;font-size:20px;letter-spacing:-.5px}
+  .logo em{color:var(--accent);font-style:normal}
+  nav{display:flex;gap:8px;align-items:center}
+  nav a{text-decoration:none;font-size:14px;font-weight:600;padding:8px 16px;border:2px solid transparent;border-radius:999px;transition:border-color .2s,background .2s}
+  nav a:hover{border-color:var(--line)}
+  nav a.active{background:var(--ink);color:var(--bg)}
+  #themeBtn{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:600;transition:transform .15s}
+  #themeBtn:hover{transform:rotate(-4deg) scale(1.05)}
+
+  .hero{padding:8vh 4vw 5vh}
+  .hero h1{font-size:clamp(38px,7vw,96px);font-weight:900;line-height:.95;letter-spacing:-2px;text-transform:uppercase}
+  .hero h1 span{color:var(--accent);display:inline-block;animation:float 5s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(2deg)}}
+  .hero p{max-width:520px;color:var(--muted);font-size:16px;line-height:1.6;margin-top:20px;border-left:3px solid var(--accent);padding-left:16px}
+
+  h2.section{font-size:clamp(22px,3vw,34px);margin:0 4vw 24px;letter-spacing:-1px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:28px;padding:0 4vw 8vh;perspective:1400px}
+  .card{
+    background:var(--paper);border:2px solid var(--line);border-radius:18px;overflow:hidden;
+    transform-style:preserve-3d;transition:transform .18s ease-out,box-shadow .3s;cursor:pointer;
+    opacity:0;translate:0 40px;
+  }
+  .card.in{opacity:1;translate:0 0;transition:transform .18s ease-out,box-shadow .3s,opacity .6s,translate .6s}
+  .card:hover{box-shadow:10px 10px 0 var(--shadow)}
+  .card .photo{height:190px;overflow:hidden;border-bottom:2px solid var(--line)}
+  .card .photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1);transform:translateZ(30px) scale(1.05)}
+  .card:hover .photo img{transform:translateZ(30px) scale(1.15)}
+  .card .body{padding:22px;transform:translateZ(20px)}
+  .card h3{font-size:19px;letter-spacing:-.5px;margin-bottom:6px}
+  .card .area{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px}
+  .card p{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:14px}
+  .price{font-family:'Unbounded';font-size:15px;font-weight:700;display:inline-block;background:var(--ink);color:var(--bg);padding:6px 14px;border-radius:999px}
+
+  .form-wrap{background:var(--ink);color:var(--bg);padding:10vh 4vw;transition:background .4s,color .4s}
+  .form-panel{max-width:620px;margin:0 auto}
+  .form-panel h2{font-size:clamp(24px,3.5vw,40px);letter-spacing:-1px;margin-bottom:10px}
+  .form-panel .sub{opacity:.7;font-size:14px;margin-bottom:28px}
+  label{display:block;font-size:13px;font-weight:600;margin:18px 0 8px;letter-spacing:.3px}
+  input,textarea{width:100%;background:transparent;border:none;border-bottom:2px solid currentColor;color:inherit;padding:10px 2px;font-size:15px;font-family:inherit;transition:border-color .2s}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  input::placeholder,textarea::placeholder{color:inherit;opacity:.4}
+  button.submit{margin-top:28px;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:15px 34px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .2s}
+  button.submit:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:5px 5px 0 var(--shadow)}
+  #status{margin-top:16px;font-size:14px;color:var(--ok)}
+
+  footer{border-top:2px solid var(--line);padding:28px 4vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="veil" id="veil"></div>
+
+<header>
+  <div class="logo">ТЦ <em>«Баррикада»</em></div>
+  <nav>
+    <a href="#" data-go="index.html">Магазины</a>
+    <a href="#" class="active" data-go="rent.html">Аренда</a>
+    <button id="themeBtn">☾ темно</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Помещения<br>в аренду <span>↗</span></h1>
+  <p>Торговые блоки, складские помещения и боксы на открытой площадке — от 25 до 1200 м². До 12 000 покупателей в день: строители, бригады и частники. Кран-балка на 1 этаже, разгрузочные доки, въезд для грузовиков.</p>
+</section>
+
+<h2 class="section">Свободно сейчас</h2>
+<div class="grid" id="grid">
+  <article class="card">
+    <div class="photo"><img src="img/rent1.svg" alt="Торговое помещение 120 м²" loading="lazy"></div>
+    <div class="body">
+      <h3>Торговое · этаж 1</h3>
+      <div class="area">120 м² · витрины на главную аллею</div>
+      <p>Под магазин стройматериалов, шоурум или кассовую зону. Ремонт сделан, высота потолков 4,5 м, отдельный вход с улицы.</p>
+      <span class="price">от 2 900 ₽/м²</span>
+    </div>
+  </article>
+  <article class="card">
+    <div class="photo"><img src="img/rent2.svg" alt="Помещение 65 м²" loading="lazy"></div>
+    <div class="body">
+      <h3>Торговое · этаж 2</h3>
+      <div class="area">65 м² · рядом лифт для грузов и тележки</div>
+      <p>Высокая проходимость. Для торговли крепёжом, расходниками, электрикой. Готово к заезду.</p>
+      <span class="price">от 2 200 ₽/м²</span>
+    </div>
+  </article>
+  <article class="card">
+    <div class="photo"><img src="img/rent3.svg" alt="Офис 45 м²" loading="lazy"></div>
+    <div class="body">
+      <h3>Офисное · этаж 3</h3>
+      <div class="area">45 м² · тихое крыло, кондиционер</div>
+      <p>Под офис отдела продаж, снабжение или проектное бюро. Коммунальные платежи и интернет включены.</p>
+      <span class="price">от 1 500 ₽/м²</span>
+    </div>
+  </article>
+  <article class="card">
+    <div class="photo"><img src="img/rent4.svg" alt="Складской блок 1200 м²" loading="lazy"></div>
+    <div class="body">
+      <h3>Складской блок · этаж 1</h3>
+      <div class="area">1200 м² · разгрузочные доки, кран-балка 5 т</div>
+      <p>Под базу стройматериалов или оптовый склад. Возможна разбивка от 300 м², въезд погрузчика внутрь.</p>
+      <span class="price">по запросу</span>
+    </div>
+  </article>
+</div>
+
+<section class="form-wrap">
+  <div class="form-panel">
+    <h2>Связаться с отделом аренды</h2>
+    <div class="sub">Ответим на почту в течение одного рабочего дня. Или звоните: +7 (495) 123-45-68.</div>
+    <form id="rentForm">
+      <label for="name">Ваше имя</label>
+      <input id="name" required placeholder="Иван Петров">
+      <label for="email">Email</label>
+      <input id="email" type="email" required placeholder="you@example.com">
+      <label for="phone">Телефон (необязательно)</label>
+      <input id="phone" type="tel" placeholder="+7 (___) ___-__-__">
+      <label for="msg">Сообщение</label>
+      <textarea id="msg" rows="4" required placeholder="Интересующее помещение, площадь, сфера бизнеса…"></textarea>
+      <button class="submit" type="submit">Отправить заявку →</button>
+      <div id="status"></div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <span>© ТЦ «Баррикада», 2026</span>
+  <span>Отдел аренды: rent@barrikada-tc.ru · г. Москва, ул. Примерная, 10</span>
+</footer>
+
+<script>
+/* 3D-наклон карточек за курсором */
+document.querySelectorAll('.card').forEach((card,i)=>{
+  setTimeout(()=>card.classList.add('in'),80*i);
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`rotateY(${x*14}deg) rotateX(${-y*12}deg) translateZ(10px)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform='rotateY(0) rotateX(0)';});
+});
+
+/* переходы между страницами */
+document.querySelectorAll('[data-go]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    if(a.dataset.go===location.pathname.split('/').pop()) return;
+    const v=document.getElementById('veil');
+    v.classList.remove('on'); void v.offsetWidth; v.classList.add('on');
+    setTimeout(()=>location.href=a.dataset.go,350);
+  });
+});
+addEventListener('pageshow',e=>{ if(e.persisted) document.getElementById('veil').classList.remove('on'); });
+
+/* форма → письмо */
+document.getElementById('rentForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const subject=encodeURIComponent('Заявка на аренду — ТЦ «Баррикада»');
+  const body=encodeURIComponent(
+    'Имя: '+document.getElementById('name').value+'\n'+
+    'Email: '+document.getElementById('email').value+'\n'+
+    'Телефон: '+document.getElementById('phone').value+'\n\n'+
+    document.getElementById('msg').value);
+  location.href='mailto:rent@barrikada-tc.ru?subject='+subject+'&body='+body;
+  document.getElementById('status').textContent='Открываем почтовый клиент с готовым письмом…';
+});
+
+const btn=document.getElementById('themeBtn');
+function setTheme(t){document.documentElement.dataset.theme=t;btn.textContent=t==='dark'?'☀ светло':'☾ темно';localStorage.theme=t;}
+setTheme(localStorage.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+btn.onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+</script>
+</body>
+</html>
