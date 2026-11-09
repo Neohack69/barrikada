@@ -18,11 +18,19 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
 
-  /* 3D-фон: стройматериалы, движутся со скроллом */
-  .bg3d{position:fixed;inset:0;z-index:-1;perspective:900px;overflow:hidden;pointer-events:none}
+  /* 3D-фон: цветные объёмные стройматериалы */
+  .bg3d{position:fixed;inset:0;z-index:-1;perspective:1000px;overflow:hidden;pointer-events:none}
   .bg-world{position:absolute;left:50%;top:45%;width:0;height:0;transform-style:preserve-3d;will-change:transform}
-  .bg-item{position:absolute;opacity:.5}
-  .bg-item svg{display:block;overflow:visible}
+  .bg-item{position:absolute;transform-style:preserve-3d}
+  .bg-item .face{position:absolute;left:0;top:0;border-radius:4px}
+  .bg-item .front{border:2px solid rgba(0,0,0,.25)}
+  .bg-item .top{border:2px solid rgba(0,0,0,.12);filter:brightness(1.35)}
+  .bg-item .side{border:2px solid rgba(0,0,0,.35);filter:brightness(.7)}
+  /* кирпич: лицевая кладка */
+  .bg-item.brick .front::before,.bg-item.brick .front::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(0,0,0,.3)}
+  .bg-item.brick .front::after{top:0;bottom:0;left:50%;width:2px;height:auto;background:rgba(0,0,0,.3)}
+  /* доска: текстура */
+  .bg-item.plank .front::before{content:"";position:absolute;left:8%;right:8%;top:30%;height:2px;background:rgba(0,0,0,.18);box-shadow:0 8px 0 rgba(0,0,0,.18)}
   .bg-dot{position:absolute;border-radius:50%;background:var(--accent);opacity:.25}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
   a{color:inherit}
@@ -307,30 +315,47 @@ scene.addEventListener('pointermove',e=>{
 scene.addEventListener('pointerup',()=>{dragging=false;setTimeout(()=>auto=true,3000);});
 (function spin(){ if(auto) rz+=.08; apply(); requestAnimationFrame(spin); })();
 
-/* 3D-фон: стройматериалы + движение со скроллом */
+/* 3D-фон: цветные объёмные стройматериалы + движение со скроллом */
 const bgWorld=document.getElementById('bgWorld');
 (function buildBg(){
   const rnd=(i)=>{const x=Math.sin(i*127.1)*43758.5453;return x-Math.floor(x);};
-  const F='fill="var(--paper)" stroke="var(--line)" stroke-width="5"';
-  const A='fill="var(--accent)"';
-  const items=[
-    `<svg viewBox="0 0 100 60"><rect x="4" y="4" width="92" height="52" rx="6" ${F}/><line x1="4" y1="30" x2="96" y2="30" ${F} fill="none"/><line x1="50" y1="4" x2="50" y2="30" ${F} fill="none"/><line x1="26" y1="30" x2="26" y2="56" ${F} fill="none"/><line x1="74" y1="30" x2="74" y2="56" ${F} fill="none"/></svg>`, // кирпич
-    `<svg viewBox="0 0 120 40"><rect x="4" y="4" width="112" height="32" rx="5" ${F}/><line x1="16" y1="14" x2="104" y2="14" ${F} fill="none" opacity=".5"/><line x1="16" y1="26" x2="104" y2="26" ${F} fill="none" opacity=".5"/></svg>`, // доска
-    `<svg viewBox="0 0 90 90"><path d="M18 30 h54 l-8 48 a10 10 0 0 1-10 8 H36 a10 10 0 0 1-10-8 z" ${F}/><ellipse cx="45" cy="30" rx="27" ry="8" ${A}/><path d="M64 14 q8 12 0 20" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/></svg>`, // ведро
-    `<svg viewBox="0 0 100 100"><polygon points="50,8 86,29 86,71 50,92 14,71 14,29" ${F}/><circle cx="50" cy="50" r="20" fill="var(--bg)" stroke="var(--line)" stroke-width="5"/></svg>`, // гайка
-    `<svg viewBox="0 0 110 50"><rect x="4" y="10" width="102" height="30" rx="15" ${F}/><line x1="34" y1="10" x2="34" y2="40" ${F} fill="none"/><line x1="74" y1="10" x2="74" y2="40" ${F} fill="none"/></svg>`, // труба
-    `<svg viewBox="0 0 70 110"><rect x="20" y="10" width="30" height="70" rx="8" ${F}/><rect x="8" y="80" width="54" height="20" rx="6" ${A}/></svg>`, // мастерок
+  // материалы: [цвет лицевой грани, ширина, высота, глубина, класс]
+  const mats=[
+    ['#c2571b',86,44,40,'brick'],   // кирпич
+    ['#e8a13a',120,26,30,'plank'],  // доска
+    ['#2b6cb0',58,52,44,''],        // ведро (брусок-корпус)
+    ['#c53030',96,30,30,'plank'],   // труба/брус
+    ['#2c6e3f',60,60,34,''],        // гайка-блок
+    ['#b83280',70,40,36,'brick'],   // блок
   ];
-  for(let i=0;i<14;i++){
-    const d=document.createElement('div');
-    d.className='bg-item';
-    const w=50+rnd(i)*90;
-    d.style.width=w+'px';
-    d.innerHTML=items[i%items.length];
-    d.style.left=(rnd(i+10)*1300-650)+'px';
-    d.style.top=(rnd(i+20)*850-425)+'px';
-    d.style.transform=`translateZ(${-rnd(i+30)*550}px) rotate(${rnd(i+40)*50-25}deg)`;
-    bgWorld.appendChild(d);
+  for(let i=0;i<13;i++){
+    const [c,w,h,d,cls]=mats[i%mats.length];
+    const el=document.createElement('div');
+    el.className='bg-item '+(cls||'brick');
+    const s=.7+rnd(i)*.8; // масштаб
+    const W=w*s,H=h*s,D=d*s;
+    el.innerHTML=`
+      <div class="face front" style="width:${W}px;height:${H}px;background:${c};transform:translate(-50%,-50%) translateZ(${D/2}px)"></div>
+      <div class="face back" style="width:${W}px;height:${H}px;background:${c};transform:translate(-50%,-50%) rotateY(180deg) translateZ(${D/2}px)"></div>
+      <div class="face top" style="width:${W}px;height:${D}px;background:${c};transform:translate(-50%,-50%) rotateX(90deg) translateZ(${H/2}px)"></div>
+      <div class="face bottom" style="width:${W}px;height:${D}px;background:${c};transform:translate(-50%,-50%) rotateX(-90deg) translateZ(${H/2}px)"></div>
+      <div class="face side" style="width:${D}px;height:${H}px;background:${c};transform:translate(-50%,-50%) rotateY(90deg) translateZ(${W/2}px)"></div>
+      <div class="face side" style="width:${D}px;height:${H}px;background:${c};transform:translate(-50%,-50%) rotateY(-90deg) translateZ(${W/2}px)"></div>`;
+    el.style.left=(rnd(i+10)*1300-650)+'px';
+    el.style.top=(rnd(i+20)*850-425)+'px';
+    const z=-rnd(i+30)*550;
+    const rz=rnd(i+40)*40-20;
+    el.dataset.base=`translateZ(${z}px) rotateZ(${rz}deg)`;
+    el.style.transform=el.dataset.base;
+    el.style.opacity=.85;
+    bgWorld.appendChild(el);
+    // лёгкое парение
+    const spd=2.5+rnd(i+50)*2, amp=8+rnd(i+60)*10, ph=rnd(i+70)*6.28;
+    (function float(el){
+      const t=performance.now()/1000;
+      el.style.transform=el.dataset.base+` translateY(${Math.sin(t*spd+ph)*amp}px)`;
+      requestAnimationFrame(()=>float(el));
+    })(el);
   }
   for(let i=0;i<8;i++){
     const d=document.createElement('div');
