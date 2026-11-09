@@ -194,15 +194,18 @@ function render(){
   list.forEach((s,i)=>{
     const el=document.createElement('article');
     el.className='card';
+    const id=shops.indexOf(s);
     el.innerHTML=`
       <div class="photo"><img src="${s.img}" alt="${s.name}" loading="lazy"></div>
       <div class="body">
-        <div class="num">№ 10${i+1}</div>
+        <div class="num">№ 10${id+1} · подробнее →</div>
         <h3>${s.name}<span class="tag">${s.cat}</span></h3>
         <div class="floor">Этаж ${s.floor}</div>
         <p>${s.desc}</p>
         <a class="phone" href="tel:${s.phone.replace(/[^+\d]/g,'')}">${s.phone}</a>
       </div>`;
+    el.addEventListener('click',()=>goTo('shop.html?id='+id));
+    el.querySelector('.phone').addEventListener('click',e=>e.stopPropagation());
     grid.appendChild(el);
     bindTilt(el);
     setTimeout(()=>el.classList.add('in'),60*i);
@@ -213,13 +216,16 @@ category.addEventListener('change',render);
 render();
 
 /* переходы между страницами */
+function goTo(url){
+  const v=document.getElementById('veil');
+  v.classList.remove('on'); void v.offsetWidth; v.classList.add('on');
+  setTimeout(()=>location.href=url,350);
+}
 document.querySelectorAll('[data-go]').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
     if(a.dataset.go===location.pathname.split('/').pop()) return;
-    const v=document.getElementById('veil');
-    v.classList.remove('on'); void v.offsetWidth; v.classList.add('on');
-    setTimeout(()=>location.href=a.dataset.go,350);
+    goTo(a.dataset.go);
   });
 });
 addEventListener('pageshow',e=>{ if(e.persisted) document.getElementById('veil').classList.remove('on'); });
