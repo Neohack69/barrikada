@@ -69,12 +69,6 @@
   button.submit:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:5px 5px 0 var(--shadow)}
   #status{margin-top:16px;font-size:14px;color:var(--ok)}
 
-  .map-section{border-top:2px solid var(--line);padding:7vh 4vw}
-  .map-section h2{font-size:clamp(22px,3vw,34px);letter-spacing:-1px;text-transform:uppercase;margin-bottom:10px}
-  .map-section .addr{color:var(--muted);font-size:15px;margin-bottom:22px}
-  .map-frame{border:2px solid var(--line);border-radius:18px;overflow:hidden;height:420px;box-shadow:10px 10px 0 var(--shadow)}
-  .map-frame iframe{width:100%;height:100%;border:0;filter:saturate(.85)}
-  html[data-theme="dark"] .map-frame iframe{filter:invert(.92) hue-rotate(180deg) saturate(.7)}
 
   footer{border-top:2px solid var(--line);padding:28px 4vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}
 </style>
@@ -155,13 +149,6 @@
   </div>
 </section>
 
-<section class="map-section">
-  <h2>Как доехать</h2>
-  <p class="addr">Московская область, г. Орехово-Зуево, ул. Урицкого, д. 92</p>
-  <div class="map-frame">
-    <iframe src="https://yandex.ru/map-widget/v1/?text=%D0%9C%D0%BE%D1%81%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D1%8C%2C%20%D0%B3.%20%D0%9E%D1%80%D0%B5%D1%85%D0%BE%D0%B2%D0%BE-%D0%97%D1%83%D0%B5%D0%B2%D0%BE%2C%20%D1%83%D0%BB.%20%D0%A3%D1%80%D0%B8%D1%86%D0%BA%D0%BE%D0%B3%D0%BE%2C%20%D0%B4.%2092" allowfullscreen loading="lazy"></iframe>
-  </div>
-</section>
 
 <footer>
   <span>© СТЦ «Баррикада», 2026</span>
