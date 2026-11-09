@@ -16,7 +16,8 @@
     --muted:#9a9080; --ok:#68d391; --shadow:rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
+  body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden;position:relative}
+  body::before{content:"";position:absolute;inset:0;background:url("img/building.jpg") center top/cover no-repeat;opacity:.09;filter:saturate(.6);pointer-events:none;z-index:-1}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
   a{color:inherit}
   .veil{position:fixed;inset:0;background:var(--ink);z-index:100;transform:scaleY(0);transform-origin:bottom;pointer-events:none}
@@ -33,9 +34,7 @@
   #themeBtn{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer;font-size:13px;font-weight:600;transition:transform .15s}
   #themeBtn:hover{transform:rotate(-4deg) scale(1.05)}
 
-  .hero{padding:8vh 4vw 5vh;position:relative;overflow:hidden}
-  .hero::before{content:"";position:absolute;inset:0;background:url("img/building.jpg") center 30%/cover no-repeat;opacity:.14;filter:saturate(.7);pointer-events:none;mask-image:linear-gradient(to bottom,black 40%,transparent);-webkit-mask-image:linear-gradient(to bottom,black 40%,transparent)}
-  .hero>*{position:relative}
+  .hero{padding:8vh 4vw 5vh}
   .hero h1{font-size:clamp(38px,7vw,96px);font-weight:900;line-height:.95;letter-spacing:-2px;text-transform:uppercase}
   .hero h1 span{color:var(--accent);display:inline-block;animation:float 5s ease-in-out infinite}
   @keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(2deg)}}

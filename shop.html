@@ -16,7 +16,8 @@
     --muted:#9a9080; --shadow:rgba(0,0,0,.5);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
+  body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden;position:relative}
+  body::before{content:"";position:absolute;inset:0;background:url("img/building.jpg") center top/cover no-repeat;opacity:.09;filter:saturate(.6);pointer-events:none;z-index:-1}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
   a{color:inherit}
   .veil{position:fixed;inset:0;background:var(--ink);z-index:100;transform:scaleY(0);transform-origin:bottom;pointer-events:none;animation:veil .7s cubic-bezier(.7,0,.2,1) forwards}
@@ -35,9 +36,6 @@
   .wrap{max-width:1100px;margin:0 auto;padding:6vh 20px 10vh}
   .crumb{font-size:13px;color:var(--muted);margin-bottom:28px}
   .crumb a{color:var(--accent);text-decoration:none;font-weight:600}
-  .head{position:relative;overflow:hidden;padding:5vh 4vw 5vh;margin:0 -4vw 48px}
-  .head::before{content:"";position:absolute;inset:0;background:url("img/building.jpg") center 30%/cover no-repeat;opacity:.14;filter:saturate(.7);pointer-events:none;mask-image:linear-gradient(to bottom,black 45%,transparent);-webkit-mask-image:linear-gradient(to bottom,black 45%,transparent)}
-  .head>*{position:relative}
 
   .head{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:start;margin-bottom:48px}
   .head h1{font-size:clamp(30px,5vw,56px);font-weight:900;line-height:1;letter-spacing:-1.5px;text-transform:uppercase;margin-bottom:14px}
