@@ -99,6 +99,15 @@
   .flag{position:absolute;font-family:'Unbounded';font-size:11px;font-weight:700;color:var(--accent);
     left:-310px;top:-160px;transform:translateZ(150px);letter-spacing:1px}
 
+  .rent-cta{margin:0 4vw 7vh;background:var(--ink);color:var(--bg);border-radius:18px;padding:6vh 5vw;display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:center;transition:background .4s,color .4s}
+  .rent-cta h2{font-size:clamp(26px,4vw,48px);font-weight:900;letter-spacing:-1.5px;line-height:1;text-transform:uppercase;margin-bottom:16px}
+  .rent-cta p{opacity:.75;font-size:15px;line-height:1.6;max-width:460px;margin-bottom:24px}
+  .rent-cta .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;border-radius:999px;padding:14px 30px;font-size:15px;font-weight:600;transition:transform .15s,box-shadow .2s}
+  .rent-cta .btn:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:5px 5px 0 var(--shadow)}
+  .cta-photo{border:2px solid var(--bg);border-radius:14px;overflow:hidden;transform:rotate(2deg);transition:transform .3s}
+  .cta-photo:hover{transform:rotate(0)}
+  .cta-photo img{width:100%;height:240px;object-fit:cover;display:block}
+
   .map-section{border-top:2px solid var(--line);padding:7vh 4vw}
   .map-section h2{font-size:clamp(22px,3vw,34px);letter-spacing:-1px;text-transform:uppercase;margin-bottom:10px}
   .map-section .addr{color:var(--muted);font-size:15px;margin-bottom:22px}
@@ -108,7 +117,7 @@
   html[data-theme="dark"] .map-frame iframe{filter:invert(.92) hue-rotate(180deg) saturate(.7)}
 
   footer{border-top:2px solid var(--line);padding:28px 4vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted)}
-  @media(max-width:760px){.hero{grid-template-columns:1fr}.hero p{justify-self:start}}
+  @media(max-width:760px){.hero{grid-template-columns:1fr}.hero p{justify-self:start}.rent-cta{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -164,6 +173,15 @@
       </div>
     </div>
   </div>
+</section>
+
+<section class="rent-cta">
+  <div>
+    <h2>Помещения<br>в аренду</h2>
+    <p>Торговые блоки, склады и боксы на открытой площадке — от 25 до 1200 м². Разгрузочные доки, кран-балка, въезд для грузовиков. От 1 500 ₽/м² в месяц.</p>
+    <a class="btn" href="#" data-go="rent.html">Смотреть предложения →</a>
+  </div>
+  <div class="cta-photo"><img src="img/rent4.svg" alt="Складской блок"></div>
 </section>
 
 <section class="map-section">
