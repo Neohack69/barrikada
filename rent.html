@@ -18,17 +18,11 @@
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',Arial,sans-serif;background:var(--bg);color:var(--ink);transition:background .4s,color .4s;overflow-x:hidden}
 
-  /* 3D-фон, движется со скроллом */
+  /* 3D-фон: стройматериалы, движутся со скроллом */
   .bg3d{position:fixed;inset:0;z-index:-1;perspective:900px;overflow:hidden;pointer-events:none}
   .bg-world{position:absolute;left:50%;top:45%;width:0;height:0;transform-style:preserve-3d;will-change:transform}
-  .bg-plate{position:absolute;background:var(--paper);border:2px solid var(--line);border-radius:10px;opacity:.55}
-  .bg-cube{position:absolute;transform-style:preserve-3d}
-  .bg-cube i{position:absolute;background:var(--paper);border:2px solid var(--line);opacity:.5;border-radius:6px}
-  .bg-cube .f{width:var(--s);height:var(--s);transform:translate(-50%,-50%) translateZ(calc(var(--s)/2))}
-  .bg-cube .b{width:var(--s);height:var(--s);transform:translate(-50%,-50%) rotateY(180deg) translateZ(calc(var(--s)/2))}
-  .bg-cube .l{width:var(--s);height:var(--s);transform:translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--s)/2))}
-  .bg-cube .r{width:var(--s);height:var(--s);transform:translate(-50%,-50%) rotateY(90deg) translateZ(calc(var(--s)/2))}
-  .bg-cube .t{width:var(--s);height:var(--s);transform:translate(-50%,-50%) rotateX(90deg) translateZ(calc(var(--s)/2))}
+  .bg-item{position:absolute;opacity:.5}
+  .bg-item svg{display:block;overflow:visible}
   .bg-dot{position:absolute;border-radius:50%;background:var(--accent);opacity:.25}
   h1,h2,h3,.logo{font-family:'Unbounded',sans-serif}
   a{color:inherit}
@@ -208,32 +202,32 @@ document.getElementById('rentForm').addEventListener('submit',e=>{
   document.getElementById('status').textContent='Открываем почтовый клиент с готовым письмом…';
 });
 
-/* 3D-фон: сцена + движение со скроллом */
+/* 3D-фон: стройматериалы + движение со скроллом */
 const bgWorld=document.getElementById('bgWorld');
 (function buildBg(){
   const rnd=(i)=>{const x=Math.sin(i*127.1)*43758.5453;return x-Math.floor(x);};
-  for(let i=0;i<7;i++){
-    const p=document.createElement('div');
-    p.className='bg-plate';
-    const w=120+rnd(i)*220;
-    p.style.width=w+'px'; p.style.height=w*.65+'px';
-    p.style.left=(rnd(i+10)*1200-600)+'px';
-    p.style.top=(rnd(i+20)*800-400)+'px';
-    p.style.transform=`translateZ(${-rnd(i+30)*500}px) rotateZ(${rnd(i+40)*30-15}deg)`;
-    bgWorld.appendChild(p);
+  const F='fill="var(--paper)" stroke="var(--line)" stroke-width="5"';
+  const A='fill="var(--accent)"';
+  const items=[
+    `<svg viewBox="0 0 100 60"><rect x="4" y="4" width="92" height="52" rx="6" ${F}/><line x1="4" y1="30" x2="96" y2="30" ${F} fill="none"/><line x1="50" y1="4" x2="50" y2="30" ${F} fill="none"/><line x1="26" y1="30" x2="26" y2="56" ${F} fill="none"/><line x1="74" y1="30" x2="74" y2="56" ${F} fill="none"/></svg>`, // кирпич
+    `<svg viewBox="0 0 120 40"><rect x="4" y="4" width="112" height="32" rx="5" ${F}/><line x1="16" y1="14" x2="104" y2="14" ${F} fill="none" opacity=".5"/><line x1="16" y1="26" x2="104" y2="26" ${F} fill="none" opacity=".5"/></svg>`, // доска
+    `<svg viewBox="0 0 90 90"><path d="M18 30 h54 l-8 48 a10 10 0 0 1-10 8 H36 a10 10 0 0 1-10-8 z" ${F}/><ellipse cx="45" cy="30" rx="27" ry="8" ${A}/><path d="M64 14 q8 12 0 20" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round"/></svg>`, // ведро
+    `<svg viewBox="0 0 100 100"><polygon points="50,8 86,29 86,71 50,92 14,71 14,29" ${F}/><circle cx="50" cy="50" r="20" fill="var(--bg)" stroke="var(--line)" stroke-width="5"/></svg>`, // гайка
+    `<svg viewBox="0 0 110 50"><rect x="4" y="10" width="102" height="30" rx="15" ${F}/><line x1="34" y1="10" x2="34" y2="40" ${F} fill="none"/><line x1="74" y1="10" x2="74" y2="40" ${F} fill="none"/></svg>`, // труба
+    `<svg viewBox="0 0 70 110"><rect x="20" y="10" width="30" height="70" rx="8" ${F}/><rect x="8" y="80" width="54" height="20" rx="6" ${A}/></svg>`, // мастерок
+  ];
+  for(let i=0;i<14;i++){
+    const d=document.createElement('div');
+    d.className='bg-item';
+    const w=50+rnd(i)*90;
+    d.style.width=w+'px';
+    d.innerHTML=items[i%items.length];
+    d.style.left=(rnd(i+10)*1300-650)+'px';
+    d.style.top=(rnd(i+20)*850-425)+'px';
+    d.style.transform=`translateZ(${-rnd(i+30)*550}px) rotate(${rnd(i+40)*50-25}deg)`;
+    bgWorld.appendChild(d);
   }
-  for(let i=0;i<6;i++){
-    const c=document.createElement('div');
-    c.className='bg-cube';
-    const s=26+rnd(i+50)*44;
-    c.style.setProperty('--s',s+'px');
-    c.style.left=(rnd(i+60)*1100-550)+'px';
-    c.style.top=(rnd(i+70)*700-350)+'px';
-    c.innerHTML='<i class="f"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="t"></i>';
-    c.style.transform=`translateZ(${-rnd(i+80)*400}px) rotateX(${rnd(i+90)*50}deg) rotateY(${rnd(i+100)*50}deg)`;
-    bgWorld.appendChild(c);
-  }
-  for(let i=0;i<10;i++){
+  for(let i=0;i<8;i++){
     const d=document.createElement('div');
     d.className='bg-dot';
     const r=4+rnd(i+110)*10;
